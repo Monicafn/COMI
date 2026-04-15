@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+dl/
+confocal/
+deblursrgan4_C0depth_Z005_predict_img/
+*.h5

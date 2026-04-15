@@ -188,17 +188,13 @@ class StarGAN(object):
 
         self.combined_hq = Model([img_lq, img_hq], [validity_hq, validity_reconstr_lq,
                                                     fake_hq_features, reconstr_lq_features, img_lq_id])
-        #self.combined_hq_m = multi_gpu_model(self.combined_hq, gpus=4)
-        #Estoy cambiando a self.combined
-        self.combined_hq_m = self.combined_hq
+        self.combined_hq_m = multi_gpu_model(self.combined_hq, gpus=4)
         self.combined_hq_m.compile(loss=['mse', 'mse', 'mse', 'mse', 'mse'],
                                    loss_weights=[1e-3, 1e-3, 1, 1, 1],
                                    optimizer=optimizer)
         self.combined_lq = Model([img_lq, img_hq], [validity_lq, validity_reconstr_hq,
                                                     fake_lq_features, reconstr_hq_features, img_hq_id])
-        #self.combined_lq_m = multi_gpu_model(self.combined_lq, gpus=4)
-        #Estoy cambiando a esta a self.combined_lq
-        self.combined_lq_m = self.combined_lq
+        self.combined_lq_m = multi_gpu_model(self.combined_lq, gpus=4)
         self.combined_lq_m.compile(loss=['mse', 'mse', 'mse', 'mse', 'mse'],
                                    loss_weights=[1e-3, 1e-3, 1, 1, 1],
                                    optimizer=optimizer)
@@ -399,31 +395,21 @@ class StarGAN(object):
     def PSNR(self, img1, img2):
         psnr = 0
         for i in range(img1.shape[2]) :
-            #psnr += compare_psnr(img1[:,:,i], img2[:,:,i], 1)
-            #Hice un cambio para arreglar la incopatibilidad de scikit-image por una moderna para que lo tome bien
-            psnr += compare_psnr(img1[:, :, i], img2[:, :, i], data_range=1)
+            psnr += compare_psnr(img1[:,:,i], img2[:,:,i], 1)
         return psnr / img1.shape[2]
 
-    #def SSIM(self, img1, img2):
-        #return compare_ssim(img1, img2, data_range=1, multichannel=True)
-        #Un cambio por si se también me salga error por la actualización de Scikit-image.
     def SSIM(self, img1, img2):
-        try:
-            return compare_ssim(img1, img2, data_range=1, channel_axis=-1)
-        except TypeError:
-            return compare_ssim(img1, img2, data_range=1, multichannel=True) 
+        return compare_ssim(img1, img2, data_range=1, multichannel=True)
 
 if __name__ == '__main__':
     # acgan + mnist dataset
-    #Estoy cambiando de 0 a -1 eso quiere decir que voy a cambiar de GPU a CPU 
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     dcgan = StarGAN()
     save_num = 500
     epoch = 25000
     set = 'C0depth'
     z_depth = 'Z005'
     model = 'deblursrgan4' + '_' + set + '_' + z_depth
-    #batch_size = 4 Estoy cambiando de 4 a 1 para poder usaar la cantidad en este caso será una CPU
-    batch_size = 1
+    batch_size = 4
     dcgan.test(model=model, epochs=epoch, batch_size=batch_size, sample_interval=int(epoch / save_num), set=set,
                 z_depth=z_depth)
