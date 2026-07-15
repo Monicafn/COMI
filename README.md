@@ -1,84 +1,137 @@
-# COMI : Correction of Out-of-focus Microscopic Images by Deep Learning 
-   Microscopic images are widely used in scientific research and medical discovery. However, images obtained by low cost microscope are often out-of-focus, resulting poor performance in research and diagnosis. 
-   
-   We present a Cycle Generative Adversarial Network (CycleGAN) based model and a multi-component weighted loss function to address this issue. Our method shows good generalization capabilities across diverse research fields by analyzing various cellular structures ranging from protozoan parasite to nucleus, actin and mitochondria of mammalian cells, demonstrating a great promise for bioimaging. 
-  
-   The proposed method contains two generators(Source Generator and Target Generator)and two discriminators(Source Discriminator and Target Discriminator). Source Generator translates out-of-focus image to in-focus image and Target Discriminator tries to distinguish real in-focus image and generated in-focus image.Target Generator translates in-focus image to out-of-focus image and Source Discriminator tries to distinguish real out-of-focus image and generated out-of-focus image.
-![figure2.png](https://github.com/jiangdat/COMI/raw/main/figure/figure2.png)
+# Adaptación experimental de COMI para restauración de imágenes microscópicas
 
+Este repositorio contiene la reproducción y adaptación experimental de
+COMI (*Correction of Out-of-focus Microscopic Images by Deep Learning*)
+realizada en el marco del Trabajo Fin de Máster:
 
-## 1. Prerequisites
+**Desarrollo de métodos de corrección de artefactos en microscopía de
+fluorescencia de células uterinas mediante técnicas de aprendizaje automático.**
 
-#### Ubuntu 16.04 
+## Contexto del TFM
 
-#### Tesla K40C GPU
+El TFM fue desarrollado conjuntamente por:
 
-#### Python 3.6 
+- Mónica Fernández Navarro
+- María Rodríguez Buitrago
 
-#### Keras 2.2.4 
+El estudio completo evaluó cuatro enfoques:
 
-#### Tensorflow 1.14.0
+- Noise2Void
+- CARE
+- COMI
+- Restormer
 
-## 2. Installation
-### Clone this repo:
-     git clone https://github.com/jiangdat/COMI
-     cd COMI
+Este repositorio contiene exclusivamente el módulo experimental de COMI.
+No representa el código completo del TFM.
 
-## 3. Datasets
-  
-   We collect and publish two datasets for correcting out-of-focus microscopic images, including Leishmania parasite dataset  and Bovine Pulmonary Artery Endothelial Cells (BPAEC) dataset.
-   
-   
-![table1.png](https://github.com/jiangdat/COMI/raw/main/figure/table1.png)
-   
-#### download our datasets:
-    https://data.mendeley.com/datasets/m3jxgb54c9/4
+## Código original
 
-## 4. Train
+Esta adaptación parte del repositorio original:
 
-#### set the parameter and path in deblur.py, then using:
-    python deblur.py
+https://github.com/jiangdat/COMI
 
-## 5. Test
+Artículo asociado:
 
-#### set the parameter and path in test.py, then using:
-    python test.py
+Zhang, C. et al. (2022).
+*Correction of out-of-focus microscopic images by deep learning*.
+Computational and Structural Biotechnology Journal, 20, 1957–1966.
 
-## 6. Apply a pre-trained model
+El código original se distribuye bajo licencia MIT.
+Las modificaciones realizadas para el TFM se describen a continuación.
 
-#### download our pre-trainde model from link:
-    https://drive.google.com/drive/folders/13R9fZ45IyPdJrq-ATHatPc_j_977qsT3?usp=sharing
+## Modificaciones realizadas
 
-the pre-trained model can be used directly for testing.
+Se adaptó el script de evaluación para ejecutarlo en un entorno local
+con recursos limitados:
 
+- actualización de las funciones PSNR y SSIM de `scikit-image`;
+- compatibilidad con `channel_axis=-1`;
+- ejecución en CPU mediante `CUDA_VISIBLE_DEVICES=-1`;
+- eliminación del envoltorio `multi_gpu_model` en la evaluación;
+- reducción del tamaño de lote a 1;
+- registro de PSNR, SSIM y correlación de Pearson;
+- conservación de `InstanceNormalization` como objeto personalizado
+  durante la carga de los modelos.
 
-## 7. Results
+## Entorno utilizado
 
+La evaluación se realizó en un entorno local bajo WSL:
 
-Our method significantly improves the quality of out-of-focus blurred images.
-   
-![result of deblured image ](https://github.com/jiangdat/COMI/raw/main/figure/result_github.png)
+- Python 3.7
+- TensorFlow 1.14
+- Keras 2.3.1
+- keras-contrib
+- NumPy 1.16
+- scikit-image 0.19
+- OpenCV 4.5
+- SciPy 1.4
+- ejecución en CPU
 
+Las versiones heredadas son necesarias por la compatibilidad del
+código original de COMI.
 
-## 8. Related Projects
-### links of other models we have compared
+## Archivos principales
 
-#### link for "Unnatural L0 Sparse Representation for Natural Image Deblurring"(L0-regularized) : 
-    http://www.cse.cuhk.edu.hk/~leojia/projects/l0deblur/
+- `test.py`: script adaptado para evaluación en CPU.
+- `test_backup.py`: copia de respaldo del código anterior.
+- `deblur.py`: script de entrenamiento basado en la implementación original.
+- `resultado_metricas.txt`: resultados de la reproducción funcional.
+- `figure/`: figuras procedentes del proyecto original.
+- `testPicture/`: imágenes de ejemplo del proyecto original.
 
-#### link for "Deblurgan: Blind motion deblurring using conditional adversarial networks" : 
-    https://github.com/KupynOrest/DeblurGAN
+Los pesos preentrenados y los datasets no se incluyen en el repositorio.
 
-#### link for "Deblurgan-v2: Deblurring (orders-of-magnitude) faster and better" : 
-    https://github.com/TAMU-VITA/DeblurGANv2
+## Reproducción funcional
 
-#### link for "Image-to-Image Translation with Conditional Adversarial Networks"(pix2pix) : 
-    https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
+La prueba se realizó sobre el conjunto original de COMI:
 
-#### link for"Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks"(CycleGAN):
-    https://junyanz.github.io/CycleGAN
+- conjunto: `C0depth`;
+- profundidad degradada: `Z005`;
+- plano de referencia: `Z007`;
+- tamaño de lote: 1;
+- dispositivo: CPU.
 
+### Resultados
 
-## 9. Object Detection
-#### For object detection, you should follow the instruction of Yolov3. Link for Yolov3 : 
-    https://pjreddie.com/darknet/yolo/
+| Comparación | PSNR (dB) | SSIM | Pearson |
+|---|---:|---:|---:|
+| Referencia nítida frente a entrada desenfocada | 19.95 | 0.325 | 0.920 |
+| Referencia nítida frente a salida restaurada | 23.82 | 0.125 | 0.916 |
+| Referencia desenfocada frente a dirección inversa | 18.40 | 0.621 | 0.863 |
+| Referencia nítida frente a reconstrucción cíclica | 24.82 | 0.487 | 0.973 |
+
+El generador principal aumentó el PSNR en aproximadamente 3.87 dB.
+Sin embargo, la reducción de SSIM indica una modificación de la
+estructura local. La reconstrucción cíclica obtuvo los valores más
+altos, de acuerdo con el objetivo de consistencia cíclica del modelo.
+
+Estos resultados corresponden a una reproducción funcional en el
+dominio original y no demuestran una generalización favorable a las
+imágenes de laboratorio del TFM.
+
+## Datos
+
+Las imágenes privadas del laboratorio no se incluyen por motivos de
+confidencialidad.
+
+Los datasets públicos y los pesos deben obtenerse desde sus fuentes
+originales.
+
+## Autoría de esta adaptación
+
+**Mónica Fernández Navarro**
+
+- configuración del entorno local;
+- adaptación de la evaluación a CPU;
+- actualización de las métricas;
+- ejecución de las pruebas;
+- análisis e interpretación de los resultados de COMI.
+
+La definición general del estudio, la selección de métricas y la
+interpretación global del TFM se realizaron conjuntamente con
+María Rodríguez Buitrago.
+
+## Licencia
+
+El código original mantiene la licencia MIT y el copyright de sus
+autores. Las modificaciones se publican respetando dicha licencia.
