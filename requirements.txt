@@ -1,0 +1,16 @@
+# Entorno heredado para la adaptación de test.py de COMI
+# Python 3.7 recomendado
+
+numpy==1.18.5
+scipy==1.4.1
+scikit-image==0.19.3
+scikit-learn==0.24.2
+opencv-python==4.5.5.64
+Pillow==8.4.0
+
+tensorflow==1.14.0
+Keras==2.3.1
+h5py==2.10.0
+protobuf==3.20.3
+
+git+https://github.com/keras-team/keras-contrib.git
